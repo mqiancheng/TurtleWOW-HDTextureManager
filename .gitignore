@@ -1,0 +1,130 @@
+# =============================================
+# Visual Studio / .NET 项目
+# =============================================
+
+# 用户特定文件
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# 编译输出目录
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+[Bb]uilds/
+[Bb]uild[Ll]og.*
+
+# Visual Studio 缓存/选项目录
+.vs/
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# .NET Core / .NET 5+ 发布输出
+publish/
+[Pp]ublish[Ii]nfo/
+[Pp]ublish[Pp]rofiles/
+*.pubxml
+*.publishproj
+
+# NuGet 包
+*.nupkg
+# NuGet 包目录（如果使用 packages.config）
+**/packages/*
+!**/packages/build/
+# 如果使用 PackageReference（本项目），packages 目录不会被使用
+# 但保留规则以防万一
+
+# Fody / Costura 相关
+*.cache
+FodyWeavers.xsd
+
+# =============================================
+# IDE / 编辑器
+# =============================================
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Visual Studio for Mac
+.vscode/
+
+# =============================================
+# Windows 系统文件
+# =============================================
+
+# Windows 缩略图缓存
+[Tt]humbs.db
+[Tt]humbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# 回收站文件
+$RECYCLE.BIN/
+
+# Windows 快捷方式
+*.lnk
+
+# Windows 临时文件
+*.tmp
+*.temp
+~$*
+
+# =============================================
+# macOS 系统文件
+# =============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =============================================
+# 应用程序特定文件
+# =============================================
+
+# PDB 调试符号文件（由构建生成）
+*.pdb
+
+# XML 文档（由构建生成）
+*.xml
+
+# 日志文件
+*.log
+
+# 本地配置文件（如果包含敏感信息）
+# appsettings.Local.json
+# secrets.json
+
+# =============================================
+# 其他
+# =============================================
+
+# Node.js（如果项目包含前端部分）
+node_modules/
+
+# 临时文件
+*.swp
+*~
+

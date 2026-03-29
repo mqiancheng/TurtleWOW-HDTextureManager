@@ -1,0 +1,84 @@
+name: Build and Release
+
+on:
+  # 当推送标签时触发（例如 v1.0.0）
+  push:
+    tags:
+      - 'v*'
+  
+  # 允许手动触发
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 (例如: 1.0.3)'
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+      
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+        
+      - name: Restore NuGet packages
+        run: nuget restore TurtleWOW-HDTextureManager.sln
+        
+      - name: Build Release
+        run: msbuild TurtleWOW-HDTextureManager.sln /p:Configuration=Release /p:Platform="Any CPU" /verbosity:minimal
+        
+      - name: Get version
+        id: get_version
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ github.event.inputs.version }}"
+          } else {
+            $ref = "${{ github.ref }}"
+            $version = $ref -replace 'refs/tags/v', ''
+          }
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Version: $version"
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TurtleWOW-HDTextureManager
+          path: bin/Release/TurtleWOW-HDTextureManager.exe
+          
+      - name: Create Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## TurtleWOW HD Texture Manager v${{ steps.get_version.outputs.VERSION }}
+            
+            ### 下载
+            - `TurtleWOW-HDTextureManager.exe` - 单文件可执行程序，无需安装
+            
+            ### 系统要求
+            - Windows 7 或更高版本
+            - .NET Framework 4.7.2 或更高版本
+            
+            ### 使用说明
+            1. 下载 `TurtleWOW-HDTextureManager.exe`
+            2. 运行程序
+            3. 设置游戏目录（选择 WoW.exe）
+            4. 下载并安装补丁
+          files: |
+            bin/Release/TurtleWOW-HDTextureManager.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
