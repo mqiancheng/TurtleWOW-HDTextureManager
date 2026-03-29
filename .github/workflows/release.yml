@@ -72,7 +72,7 @@ jobs:
             ### 使用说明
             1. 下载 `TurtleWOW-HDTextureManager.exe`
             2. 运行程序
-            3. 设置游戏目录（选择 WoQ.exe）
+            3. 设置游戏目录（选择 WoW.exe）
             4. 下载并安装补丁
           files: |
             bin/Release/TurtleWOW-HDTextureManager.exe
