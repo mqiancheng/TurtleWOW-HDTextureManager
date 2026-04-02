@@ -50,7 +50,8 @@ namespace HDTextureManager.Services
                 ["Settings_Language"] = "语言",
                 ["Settings_ClearCache"] = "清除缓存",
                 ["Settings_Author"] = "作者：海蓝钢板",
-                
+                ["Settings_4GBPatch"] = "4GB 补丁",
+
                 // 分类标题
                 ["Section_Core"] = "核心模块",
                 ["Section_Optional"] = "可选增强",
@@ -134,11 +135,15 @@ namespace HDTextureManager.Services
                 ["Dl_DownloadingFiles"] = "正在下载 {0} 个文件 ({1} 进行中, {2} 已暂停), 平均进度: {3:F0}%",
                 ["Dl_SingleDownloading"] = "正在下载: {0}, 进度: {1:F0}%",
                 ["Dl_SinglePaused"] = "已暂停: {0}",
-                
+
                 // 文件大小单位
                 ["Size_MB"] = "{0:F1} MB",
                 ["Size_KB"] = "{0:F1} KB",
                 ["Size_Bytes"] = "{0} 字节",
+
+                // GPU 提示（本地化新增）
+                ["Msg_AmdOnly"] = "检测到 AMD（A 卡）。请使用 DXVK 2.6 及以下版本，进入游戏前切换到系统英文输入法并保持英文状态。",
+                ["Msg_AmdNvidiaMixed"] = "检测到独立 NVIDIA 与集成 AMD。请用独立 NVIDIA（N 卡）启动游戏以避免兼容问题。"
             };
 
             // 英语 (en)
@@ -152,6 +157,7 @@ namespace HDTextureManager.Services
                 ["Settings_Language"] = "Language",
                 ["Settings_ClearCache"] = "Clear Cache",
                 ["Settings_Author"] = "Author: Cliencer",
+                ["Settings_4GBPatch"] = "4GB Patch",
                 ["Section_Core"] = "Core Modules",
                 ["Section_Optional"] = "Optional Enhancements",
                 ["Section_Audio"] = "Audio Enhancements",
@@ -224,11 +230,10 @@ namespace HDTextureManager.Services
                 ["Dl_DownloadingFiles"] = "Downloading {0} files ({1} active, {2} paused), avg progress: {3:F0}%",
                 ["Dl_SingleDownloading"] = "Downloading: {0}, progress: {1:F0}%",
                 ["Dl_SinglePaused"] = "Paused: {0}",
-                
-                // File Size Units
-                ["Size_MB"] = "{0:F1} MB",
-                ["Size_KB"] = "{0:F1} KB",
-                ["Size_Bytes"] = "{0} bytes",
+
+                // GPU messages
+                ["Msg_AmdOnly"] = "Detected AMD GPU. Use DXVK 2.6 or earlier. Before launch, switch to the system English input method and keep it active.",
+                ["Msg_AmdNvidiaMixed"] = "Detected discrete NVIDIA and integrated AMD GPUs. Please launch the game with the discrete NVIDIA GPU to avoid compatibility issues."
             };
 
             // 西班牙语 (es)
@@ -242,6 +247,7 @@ namespace HDTextureManager.Services
                 ["Settings_Language"] = "Idioma",
                 ["Settings_ClearCache"] = "Borrar caché",
                 ["Settings_Author"] = "Autor: Cliencer",
+                ["Settings_4GBPatch"] = "Parche 4GB",
                 ["Section_Core"] = "Módulos principales",
                 ["Section_Optional"] = "Mejoras opcionales",
                 ["Section_Audio"] = "Mejoras de audio",
@@ -301,7 +307,7 @@ namespace HDTextureManager.Services
                 ["Msg_CacheCleared"] = "Limpiados {0} archivos\nEspacio liberado: {1}",
                 ["Msg_MissingDeps"] = "Faltan dependencias: {0}\n\nDescárguelas primero",
                 ["Msg_CannotEnable"] = "No se puede activar {0}\n\nFaltan dependencias:\n{1}\n\nDescárguelas e instálelas primero.",
-                ["Msg_StopDownload"] = "Hay descargas activas.\n¿Detener descargas y salir?",
+                ["Msg_StopDownload"] = "Hay descargas activas.\n¿Detener descargas и salir?",
                 ["Msg_StopDownloadTitle"] = "Confirmar Salida",
                 
                 // Dependencias del Sistema
@@ -314,11 +320,10 @@ namespace HDTextureManager.Services
                 ["Dl_DownloadingFiles"] = "Descargando {0} archivos ({1} activos, {2} pausados), progreso: {3:F0}%",
                 ["Dl_SingleDownloading"] = "Descargando: {0}, progreso: {1:F0}%",
                 ["Dl_SinglePaused"] = "Pausado: {0}",
-                
-                // File Size Units
-                ["Size_MB"] = "{0:F1} MB",
-                ["Size_KB"] = "{0:F1} KB",
-                ["Size_Bytes"] = "{0} bytes",
+
+                // GPU messages
+                ["Msg_AmdOnly"] = "Se detectó GPU AMD. Use DXVK 2.6 o anterior. Antes de iniciar, cambie al método de entrada en inglés del sistema y manténgalo activo.",
+                ["Msg_AmdNvidiaMixed"] = "Se detectaron GPUs NVIDIA (discreta) y AMD (integrada). Inicie el juego con la GPU NVIDIA discreta para evitar problemas de compatibilidad."
             };
 
             // 德语 (de)
@@ -332,6 +337,7 @@ namespace HDTextureManager.Services
                 ["Settings_Language"] = "Sprache",
                 ["Settings_ClearCache"] = "Cache löschen",
                 ["Settings_Author"] = "Autor: Cliencer",
+                ["Settings_4GBPatch"] = "4GB-Patch",
                 ["Section_Core"] = "Kernmodule",
                 ["Section_Optional"] = "Optionale Verbesserungen",
                 ["Section_Audio"] = "Audio-Verbesserungen",
@@ -404,11 +410,10 @@ namespace HDTextureManager.Services
                 ["Dl_DownloadingFiles"] = "Lade {0} Dateien ({1} aktiv, {2} pausiert), Fortschritt: {3:F0}%",
                 ["Dl_SingleDownloading"] = "Lade: {0}, Fortschritt: {1:F0}%",
                 ["Dl_SinglePaused"] = "Pausiert: {0}",
-                
-                // File Size Units
-                ["Size_MB"] = "{0:F1} MB",
-                ["Size_KB"] = "{0:F1} KB",
-                ["Size_Bytes"] = "{0} Bytes",
+
+                // GPU messages
+                ["Msg_AmdOnly"] = "AMD GPU detected. Use DXVK 2.6 or earlier. Before launch, switch to the system English input method and keep it active.",
+                ["Msg_AmdNvidiaMixed"] = "Discrete NVIDIA and integrated AMD GPUs detected. Launch the game with the discrete NVIDIA GPU to avoid compatibility issues."
             };
 
             // 葡萄牙语 (pt)
@@ -422,6 +427,7 @@ namespace HDTextureManager.Services
                 ["Settings_Language"] = "Idioma",
                 ["Settings_ClearCache"] = "Limpar cache",
                 ["Settings_Author"] = "Autor: Cliencer",
+                ["Settings_4GBPatch"] = "Patch 4GB",
                 ["Section_Core"] = "Módulos principais",
                 ["Section_Optional"] = "Melhorias opcionais",
                 ["Section_Audio"] = "Melhorias de áudio",
@@ -494,11 +500,10 @@ namespace HDTextureManager.Services
                 ["Dl_DownloadingFiles"] = "Baixando {0} arquivos ({1} ativos, {2} pausados), progresso: {3:F0}%",
                 ["Dl_SingleDownloading"] = "Baixando: {0}, progresso: {1:F0}%",
                 ["Dl_SinglePaused"] = "Pausado: {0}",
-                
-                // File Size Units
-                ["Size_MB"] = "{0:F1} MB",
-                ["Size_KB"] = "{0:F1} KB",
-                ["Size_Bytes"] = "{0} bytes",
+
+                // GPU messages
+                ["Msg_AmdOnly"] = "GPU AMD detectada. Use DXVK 2.6 ou anterior. Antes de iniciar, altere para o método de entrada em inglês do sistema e mantenha-o ativo.",
+                ["Msg_AmdNvidiaMixed"] = "Detectadas GPUs NVIDIA (discreta) e AMD (integrada). Inicie o jogo com a GPU NVIDIA discreta para evitar problemas de compatibilidade."
             };
 
             // 俄语 (ru)
@@ -512,6 +517,7 @@ namespace HDTextureManager.Services
                 ["Settings_Language"] = "Язык",
                 ["Settings_ClearCache"] = "Очистить кэш",
                 ["Settings_Author"] = "Автор: Cliencer",
+                ["Settings_4GBPatch"] = "Патч 4GB",
                 ["Section_Core"] = "Основные модули",
                 ["Section_Optional"] = "Дополнительные улучшения",
                 ["Section_Audio"] = "Улучшения звука",
@@ -519,7 +525,7 @@ namespace HDTextureManager.Services
                 ["Status_Ready"] = "Готово",
                 ["Status_Loading"] = "Загрузка {0} модулей...",
                 ["Status_Loaded"] = "Загружено {0} модулей",
-                ["Status_LoadedLocal"] = ", найдено {0} локальных патчей",
+                ["Status_LoadedLocal"] = "， найдено {0} локальных патчей",
                 ["Status_LoadedUnknown"] = " (найдено {0} неизвестных файлов)",
                 ["Status_LoadFailed"] = "Ошибка загрузки: {0}",
                 ["Status_Downloading"] = "Загрузка {0}... {1}%",
@@ -573,22 +579,10 @@ namespace HDTextureManager.Services
                 ["Msg_CannotEnable"] = "Невозможно включить {0}\n\nОтсутствуют зависимости:\n{1}\n\nСначала скачайте и установите их.",
                 ["Msg_StopDownload"] = "Есть активные загрузки.\nОстановить загрузки и выйти?",
                 ["Msg_StopDownloadTitle"] = "Подтвердить выход",
-                
-                // Системные зависимости
-                ["Msg_MissingSystemDeps"] = "Отсутствуют системные файлы зависимостей:\n{0}\n\nЗапустите официальный лаунчер и установите VanillaHelpers и DXVK на странице модов.",
-                ["Msg_DisabledSystemDeps"] = "Следующие системные зависимости отключены:\n{0}\n\nЗапустите официальный лаунчер и включите VanillaHelpers и DXVK на странице модов.",
-                ["Status_MissingSystemDeps"] = "Отсутствуют системные зависимости, установите их в официальном лаунчере",
-                ["Status_DisabledSystemDeps"] = "Системные зависимости отключены, включите их в официальном лаунчере",
-                
-                // Download Status
-                ["Dl_DownloadingFiles"] = "Загрузка {0} файлов ({1} активно, {2} приостановлено), прогресс: {3:F0}%",
-                ["Dl_SingleDownloading"] = "Загрузка: {0}, прогресс: {1:F0}%",
-                ["Dl_SinglePaused"] = "Приостановлено: {0}",
-                
-                // File Size Units
-                ["Size_MB"] = "{0:F1} МБ",
-                ["Size_KB"] = "{0:F1} КБ",
-                ["Size_Bytes"] = "{0} байт",
+
+                // GPU messages
+                ["Msg_AmdOnly"] = "Обнаружена видеокарта AMD. Используйте DXVK 2.6 или ниже. Перед запуском переключитесь на системную английскую раскладку и держите её активной.",
+                ["Msg_AmdNvidiaMixed"] = "Обнаружены дискретная NVIDIA и интегрированная AMD. Запускайте игру на дискретной NVIDIA, чтобы избежать проблем совместимости."
             };
 
             return translations;
