@@ -19,7 +19,7 @@ namespace HDTextureManager.Services
     public class HtmlParser
     {
         private readonly HttpClient _httpClient;
-        private static readonly string Url = "https://projectreforged.github.io/downloads/index.html";
+        private static readonly string Url = "https://projectreforged.github.io/downloads/turtle/";
 
         public HtmlParser(HttpClient httpClient)
         {
