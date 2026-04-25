@@ -1427,7 +1427,7 @@ namespace HDTextureManager
         {
             try
             {
-                Process.Start("https://projectreforged.github.io/downloads/index.html");
+                Process.Start("https://projectreforged.github.io/downloads/turtle/");
                 StatusText.Text = T("Status_WebOpened");
             }
             catch (Exception ex)
