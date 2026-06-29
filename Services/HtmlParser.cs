@@ -11,7 +11,7 @@ namespace HDTextureManager.Services
 {
     public class PatchVariant
     {
-        public string Name { get; set; }  // "Less Thicc", "Performance", "Standard" 等
+        public string Name { get; set; }
         public string Version { get; set; }
         public string DownloadUrl { get; set; }
     }
@@ -34,78 +34,63 @@ namespace HDTextureManager.Services
 
             var modules = new List<PatchModule>();
 
-            // 找到所有分类区域 (div.sectionTitle)
-            var sectionTitles = doc.DocumentNode.SelectNodes("//div[@class='sectionTitle']");
-            if (sectionTitles == null) return modules;
+            // 找到所有分类区域 (div.dl-group)
+            var groups = doc.DocumentNode.SelectNodes("//div[@class='dl-group']");
+            if (groups == null) return modules;
 
-            foreach (var sectionTitle in sectionTitles)
+            foreach (var group in groups)
             {
-                var categoryText = sectionTitle.InnerText.Trim();
+                // 提取分类名称 (group-header > group-label)
+                var labelNode = group.SelectSingleNode(".//span[@class='group-label']");
+                if (labelNode == null) continue;
+
+                var categoryText = labelNode.InnerText.Trim();
 
                 // 确定分类
                 string category;
-                if (categoryText.Contains("Core Modules"))
+                if (categoryText.Contains("Dependencies"))
+                    continue;  // 跳过 Dependencies 区域（VanillaHelpers、DXVK）
+                else if (categoryText.Contains("Core"))
                     category = "Core";
-                else if (categoryText.Contains("Ultra Tier"))
-                    category = "Ultra";
-                else if (categoryText.Contains("Optional Enhancements"))
+                else if (categoryText.Contains("Optional"))
                     category = "Optional";
-                else if (categoryText.Contains("Audio"))
-                    category = "Audio";  // Audio 作为独立分类
-                else if (categoryText.Contains("HD Tier"))
-                    category = "Ultra";  // HD Tier 与 Ultra Tier 都归类到超高清材质
+                else if (categoryText.Equals("Audio", StringComparison.OrdinalIgnoreCase))
+                    category = "Audio";
+                else if (categoryText.Contains("HD Tier") || categoryText.Contains("Ultra"))
+                    category = "Ultra";
                 else
-                    continue;  // 跳过 Dependencies 等其他部分
+                    continue;
 
-                // 找到该分类下的 grid 容器（通常是 sectionTitle 的下一个兄弟节点或后面的节点）
-                var grid = FindNextGrid(sectionTitle);
-                if (grid == null) continue;
-
-                // 在 grid 中查找所有直接子级的 card（section.card）
-                // 只获取父级是当前 grid 的 cards，避免嵌套 grid 的干扰
-                var allCards = grid.SelectNodes(".//section[@class='card']");
-                if (allCards == null) continue;
-                
-                // 过滤出直接子级
-                var directCards = new System.Collections.Generic.List<HtmlNode>();
-                foreach (var card in allCards)
-                {
-                    if (card.ParentNode == grid)
-                        directCards.Add(card);
-                }
-                
-                if (directCards.Count == 0) continue;
-                
-                // 使用过滤后的列表
-                var cards = directCards;
+                // 在当前 dl-group 中查找所有 dl-card
+                var cards = group.SelectNodes(".//div[@class='dl-card']");
+                if (cards == null) continue;
 
                 foreach (var card in cards)
                 {
-                    // 提取 PATCH ID 和名称
-                    var patchNameNode = card.SelectSingleNode(".//h2[@class='patchName']");
-                    if (patchNameNode == null) continue;
+                    // 提取 PATCH ID (dl-patch)
+                    var patchIdNode = card.SelectSingleNode(".//span[@class='dl-patch']");
+                    if (patchIdNode == null) continue;
 
-                    var text = patchNameNode.InnerText.Trim();
-                    var match = Regex.Match(text, @"PATCH-([A-Z])", RegexOptions.IgnoreCase);
+                    var patchIdText = patchIdNode.InnerText.Trim();
+                    var match = Regex.Match(patchIdText, @"PATCH-([A-Z])", RegexOptions.IgnoreCase);
                     if (!match.Success) continue;
 
                     var patchId = $"PATCH-{match.Groups[1].Value.ToUpperInvariant()}";
 
-                    // 提取名称（去掉 PATCH-X 前缀和表情符号）
-                    var name = ExtractPatchName(text, patchId);
+                    // 提取名称 (dl-name)
+                    var nameNode = card.SelectSingleNode(".//span[@class='dl-name']");
+                    var name = nameNode?.InnerText.Trim() ?? patchId;
 
-                    // 提取描述
-                    var descNode = card.SelectSingleNode(".//p[@class='desc']");
+                    // 提取描述 (dl-desc)
+                    var descNode = card.SelectSingleNode(".//div[@class='dl-desc']");
                     var description = descNode?.InnerText.Trim() ?? string.Empty;
 
-                    // 依赖关系在 ParseModulesAsync 最后统一设置，不从网页解析
-
-                    // 检查是否有变体版本（subchoices）
-                    var subchoices = card.SelectSingleNode(".//div[@class='subchoices']");
-                    if (subchoices != null)
+                    // 检查是否有变体版本（dl-variants）
+                    var variantsContainer = card.SelectSingleNode(".//div[@class='dl-variants']");
+                    if (variantsContainer != null)
                     {
-                        // 有变体版本（如 PATCH-L, PATCH-U）
-                        var variants = ExtractVariants(subchoices, patchId);
+                        // 有变体版本（如 PATCH-L, PATCH-T）
+                        var variants = ExtractVariantsNew(variantsContainer, patchId);
                         foreach (var variant in variants)
                         {
                             modules.Add(new PatchModule
@@ -117,15 +102,15 @@ namespace HDTextureManager.Services
                                 DownloadUrl = variant.DownloadUrl,
                                 Category = category,
                                 Description = description,
-                                Dependencies = new List<string>() // 依赖关系在后面统一设置
+                                Dependencies = new List<string>()
                             });
                         }
                     }
                     else
                     {
                         // 普通 PATCH（没有变体）
-                        var version = ExtractVersionFromCard(card);
-                        var downloadUrl = ExtractDownloadUrlFromCard(card);
+                        var version = ExtractVersionFromCardNew(card);
+                        var downloadUrl = ExtractDownloadUrlFromCardNew(card);
 
                         if (!string.IsNullOrEmpty(downloadUrl))
                         {
@@ -137,76 +122,33 @@ namespace HDTextureManager.Services
                                 DownloadUrl = downloadUrl,
                                 Category = category,
                                 Description = description,
-                                Dependencies = new List<string>() // 依赖关系在后面统一设置
+                                Dependencies = new List<string>()
                             });
                         }
                     }
                 }
             }
 
-            // 分类排序: Core -> Optional -> Audio -> Ultra (Ultra 移到最后)
-            var sortedModules = modules.OrderBy(m => m.Category == "Core" ? 0 : 
-                                        m.Category == "Optional" ? 1 : 
+            // 分类排序: Core -> Optional -> Audio -> Ultra
+            var sortedModules = modules.OrderBy(m => m.Category == "Core" ? 0 :
+                                        m.Category == "Optional" ? 1 :
                                         m.Category == "Audio" ? 2 : 3)
                           .ThenBy(m => m.Id)
                           .ToList();
 
-            // 手动修正依赖关系（网页解析可能不准确）
+            // 手动修正依赖关系
             ApplyCorrectDependencies(sortedModules);
 
             return sortedModules;
         }
 
-        private HtmlNode FindNextGrid(HtmlNode sectionTitle)
+        private string ExtractVersionFromCardNew(HtmlNode card)
         {
-            // 查找 sectionTitle 后面的 grid div
-            var current = sectionTitle.NextSibling;
-            int siblingCount = 0;
-            while (current != null)
+            // 从 dl-version 中提取版本号，格式如 "Updated · v5.5.1" 或 "v5.0.0"
+            var versionNode = card.SelectSingleNode(".//div[@class='dl-version']");
+            if (versionNode != null)
             {
-                siblingCount++;
-                if (current.NodeType == HtmlNodeType.Element)
-                {
-                    var className = current.GetAttributeValue("class", "");
-                    if (current.Name == "div" && className == "grid")
-                    {
-                        return current;
-                    }
-                    // 如果遇到下一个 sectionTitle，说明当前分类没有 grid
-                    if (className == "sectionTitle")
-                    {
-                        return null;
-                    }
-                }
-                current = current.NextSibling;
-            }
-            return null;
-        }
-
-        private string ExtractPatchName(string text, string patchId)
-        {
-            // 去掉 PATCH-X 部分
-            var name = Regex.Replace(text, @"PATCH-[A-Z]\s*", "", RegexOptions.IgnoreCase).Trim();
-            
-            // 去掉开头的表情符号（Unicode ranges for emojis）
-            name = Regex.Replace(name, @"^[\u2600-\u26FF\u2700-\u27BF\u2B50\u2934-\u2935\u2B06\u2194-\u2199\u3030\uFE0F\s]+", "").Trim();
-            
-            // 去掉分隔符（如 —）
-            name = Regex.Replace(name, @"^[—\-\s]+", "").Trim();
-            
-            if (string.IsNullOrEmpty(name)) 
-                name = patchId;
-            
-            return name;
-        }
-
-        private string ExtractVersionFromCard(HtmlNode card)
-        {
-            // 从 updateTag 中提取版本号
-            var updateTag = card.SelectSingleNode(".//span[@class='updateTag']");
-            if (updateTag != null)
-            {
-                var text = updateTag.InnerText;
+                var text = versionNode.InnerText;
                 var match = Regex.Match(text, @"v(\d+\.\d+(?:\.\d+)?)", RegexOptions.IgnoreCase);
                 if (match.Success)
                     return match.Value.ToLowerInvariant();
@@ -214,16 +156,15 @@ namespace HDTextureManager.Services
             return "unknown";
         }
 
-        private string ExtractDownloadUrlFromCard(HtmlNode card)
+        private string ExtractDownloadUrlFromCardNew(HtmlNode card)
         {
-            // 查找下载按钮（btn primary）
-            var link = card.SelectSingleNode(".//a[contains(@class, 'btn') and contains(@class, 'primary')]");
+            // 查找主下载按钮 (btn-dl btn-primary)，在 dl-actions 内或直接在 card 内
+            var link = card.SelectSingleNode(".//a[contains(@class,'btn-dl') and contains(@class,'btn-primary')]");
             if (link != null)
             {
                 var href = link.GetAttributeValue("href", "");
                 if (!string.IsNullOrEmpty(href))
                 {
-                    // 处理相对路径
                     if (href.StartsWith("http"))
                         return href;
                     if (href.StartsWith("/"))
@@ -233,96 +174,70 @@ namespace HDTextureManager.Services
             return null;
         }
 
-        private List<PatchVariant> ExtractVariants(HtmlNode subchoices, string patchId)
+        private List<PatchVariant> ExtractVariantsNew(HtmlNode variantsContainer, string patchId)
         {
             var variants = new List<PatchVariant>();
 
-            // 只查找直接子级的 choice div，避免抓取到其他 section 的内容
-            // 使用显式的子节点遍历而不是 XPath，确保只获取直接子级
-            var choices = new List<HtmlNode>();
-            foreach (var child in subchoices.ChildNodes)
+            // 遍历直接子级的 dl-variant
+            foreach (var child in variantsContainer.ChildNodes)
             {
-                if (child.NodeType == HtmlNodeType.Element && 
-                    child.Name == "div" && 
-                    child.GetAttributeValue("class", "") == "choice")
-                {
-                    choices.Add(child);
-                }
-            }
+                if (child.NodeType != HtmlNodeType.Element ||
+                    child.Name != "div" ||
+                    child.GetAttributeValue("class", "") != "dl-variant")
+                    continue;
 
-            if (choices.Count == 0) return variants;
-
-            foreach (var choice in choices)
-            {
-                // 提取变体名称 - 只查找直接子 div 下的 b 标签
-                var nameNode = choice.SelectSingleNode(".//b");
+                // 提取变体名称 (dl-variant-name)
+                var nameNode = child.SelectSingleNode(".//div[@class='dl-variant-name']");
                 if (nameNode == null) continue;
 
-                var variantName = nameNode.InnerText.Trim();
-                
-                // 跳过非补丁下载的按钮（如 VanillaHelpers, DXVK）
-                var link = choice.SelectSingleNode(".//a[contains(@class, 'btn') and contains(@class, 'primary')]");
-                if (link == null) continue;
-                
-                var href = link.GetAttributeValue("href", "");
-                // 只处理 MPQ 文件链接和 R2.dev 链接
-                if (!href.EndsWith(".mpq", StringComparison.OrdinalIgnoreCase) && 
-                    !href.Contains("r2.dev/patches"))
-                    continue;
-                
-                // 标准化变体名称（同时处理拼写错误的 "Thicc" 和正确的 "Thick"）
-                if (variantName.IndexOf("Thicc", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    variantName.IndexOf("Thick", StringComparison.OrdinalIgnoreCase) >= 0)
-                    variantName = "Less Thick";
-                else if (variantName.IndexOf("Performance", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         variantName.Equals("Perf", StringComparison.OrdinalIgnoreCase))
-                    variantName = "Performance";
-                else if (variantName.IndexOf("Regular", StringComparison.OrdinalIgnoreCase) >= 0 || 
-                         variantName.IndexOf("Standard", StringComparison.OrdinalIgnoreCase) >= 0)
+                var rawName = nameNode.InnerText.Trim();
+
+                // 标准化变体名称
+                string variantName;
+                if (rawName.IndexOf("Regular", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    rawName.IndexOf("Standard", StringComparison.OrdinalIgnoreCase) >= 0)
                     variantName = "Standard";
-                else if (variantName.IndexOf("Ultra Base", StringComparison.OrdinalIgnoreCase) >= 0)
+                else if (rawName.IndexOf("Thicc", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         rawName.IndexOf("Thick", StringComparison.OrdinalIgnoreCase) >= 0)
+                    variantName = "Less Thick";
+                else if (rawName.IndexOf("Performance", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         rawName.Equals("Perf", StringComparison.OrdinalIgnoreCase))
+                    variantName = "Performance";
+                else if (rawName.IndexOf("Ultra Base", StringComparison.OrdinalIgnoreCase) >= 0)
                     variantName = "Ultra Base";
                 else
-                {
-                    // 无法识别的变体名称，跳过
+                    continue;  // 无法识别的变体名称
+
+                // 跳过非补丁下载的链接（如 VanillaHelpers, DXVK），只处理 .mpq 和 r2.dev/patches
+                var link = child.SelectSingleNode(".//a[contains(@class,'btn-dl')]");
+                if (link == null) continue;
+
+                var href = link.GetAttributeValue("href", "");
+                if (!href.EndsWith(".mpq", StringComparison.OrdinalIgnoreCase) &&
+                    !href.Contains("r2.dev/patches"))
                     continue;
-                }
-                
-                // 检查是否已经添加过相同名称的变体（去重）
-                if (variants.Any(v => v.Name == variantName))
-                {
-                    continue;
-                }
-                
+
                 // 处理相对路径
                 if (!href.StartsWith("http"))
                     href = href.StartsWith("/") ? $"https://projectreforged.github.io{href}" : null;
 
-                if (href == null) continue;
+                if (string.IsNullOrEmpty(href)) continue;
 
-                // 提取版本（从 updateTag 中）
-                var updateTag = choice.SelectSingleNode(".//span[@class='updateTag']");
-                var version = "unknown";
-                if (updateTag != null)
-                {
-                    var match = Regex.Match(updateTag.InnerText, @"v(\d+\.\d+(?:\.\d+)?)", RegexOptions.IgnoreCase);
-                    if (match.Success)
-                        version = match.Value.ToLowerInvariant();
-                }
+                // 去重
+                if (variants.Any(v => v.Name == variantName))
+                    continue;
 
-                // 如果没有在 choice 中找到版本，尝试从父级 card 中找
-                if (version == "unknown")
+                // 提取版本：先从父级卡片找，变体本身可能没有版本号
+                string version = "unknown";
+                var parentCard = variantsContainer.ParentNode;
+                if (parentCard != null)
                 {
-                    var parentCard = subchoices.ParentNode;
-                    if (parentCard != null)
+                    var cardVersionNode = parentCard.SelectSingleNode(".//div[@class='dl-version']");
+                    if (cardVersionNode != null)
                     {
-                        var cardUpdateTag = parentCard.SelectSingleNode(".//span[@class='updateTag']");
-                        if (cardUpdateTag != null)
-                        {
-                            var match = Regex.Match(cardUpdateTag.InnerText, @"v(\d+\.\d+(?:\.\d+)?)", RegexOptions.IgnoreCase);
-                            if (match.Success)
-                                version = match.Value.ToLowerInvariant();
-                        }
+                        var verMatch = Regex.Match(cardVersionNode.InnerText, @"v(\d+\.\d+(?:\.\d+)?)", RegexOptions.IgnoreCase);
+                        if (verMatch.Success)
+                            version = verMatch.Value.ToLowerInvariant();
                     }
                 }
 
@@ -345,7 +260,7 @@ namespace HDTextureManager.Services
             foreach (var module in modules)
             {
                 module.Dependencies.Clear();
-                
+
                 switch (module.Id)
                 {
                     case "PATCH-O":
@@ -377,8 +292,8 @@ namespace HDTextureManager.Services
                         module.Dependencies.Add("PATCH-T");
                         break;
                 }
-                
-                // 移除自身的依赖（如果有）
+
+                // 移除自身的依赖
                 module.Dependencies.RemoveAll(d => d == module.Id);
                 // 去重
                 module.Dependencies = module.Dependencies.Distinct().ToList();
